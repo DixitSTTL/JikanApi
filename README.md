@@ -1,10 +1,14 @@
 A simple Android app built with Jetpack Compose that uses the Jikan API (MyAnimeList) to fetch and display a list of anime series, with detailed views
 
+
+
 Offline Support---
 
   Uses Room Database for local caching
   
   App works in offline mode
+
+
 
 
 Architecture---
@@ -16,6 +20,8 @@ Architecture---
   Reactive UI using StateFlow
   
   Paging handled via Paging 3
+
+
 
 
 Tech Stack & Libraries---

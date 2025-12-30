@@ -45,6 +45,7 @@ import androidx.navigation.NavHostController
 import com.app.jikanapi.data.utils.Utils.isInternetConnected
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -84,23 +85,13 @@ fun YoutubeScreen(
         }
     }
 
-    val isWifiConnected = remember { mutableStateOf(context.isInternetConnected()) }
-    val coroutineScope = rememberCoroutineScope()
 
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                {
-                }
-            )
-        },
-    ) { innerPadding ->
+    Scaffold() { innerPadding ->
 
         Box(
-            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxSize()
+                .padding(innerPadding)
                 .background(Color.Black)
         ) {
             AndroidView(
@@ -108,49 +99,42 @@ fun YoutubeScreen(
                     .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier.fillMaxWidth())
                     .aspectRatio(16f / 9f)
                     .align(Alignment.Center),
-                factory = { context ->
-                    YouTubePlayerView(context).apply {
+                factory = { factoryContext ->
+                    YouTubePlayerView(factoryContext).apply {
                         lifecycleOwner.lifecycle.addObserver(this)
 
-                        addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-                            override fun onReady(youTubePlayer: YouTubePlayer) {
-                                youTubePlayer.loadVideo(youtubeId, playbackPosition)
+                        enableAutomaticInitialization = false
 
-                                if (isWifiConnected.value) {
-                                    coroutineScope.launch {
-                                        delay(500)
-                                        youTubePlayer.loadVideo(youtubeId, playbackPosition)
-                                    }
-                                }
+                        val options = IFramePlayerOptions.Builder(context)
+                            .controls(1)
+                            .rel(0)
+                            .ivLoadPolicy(3)
+                            .ccLoadPolicy(0)
+                            .build()
+
+                        initialize(object : AbstractYouTubePlayerListener() {
+                            override fun onReady(player: YouTubePlayer) {
+                                player.loadVideo(youtubeId, playbackPosition)
                             }
 
-                            override fun onCurrentSecond(
-                                youTubePlayer: YouTubePlayer,
-                                second: Float
-                            ) {
+                            override fun onCurrentSecond(player: YouTubePlayer, second: Float) {
                                 playbackPosition = second
                             }
-                        })
+                        }, options)
                     }
                 }
             )
 
-            Box(
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = "Close player",
+                tint = Color.White,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 16.dp, end = 16.dp)
-                    .background(Color.White.copy(alpha = 0.1f), shape = CircleShape)
+                    .padding(16.dp)
+                    .size(40.dp)
                     .clickable { navController.popBackStack() }
-                    .size(40.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+            )
         }
     }
 

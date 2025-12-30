@@ -47,6 +47,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.app.jikanapi.R
 import com.app.jikanapi.data.utils.Utils.openYoutube
+import com.app.jikanapi.domain.routes
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -69,6 +70,10 @@ fun AnimDetailScreen(
             when (it) {
                 is AnimDetailScreenInteract.viewYoutubeTrailer -> {
                     context.openYoutube(it.youtubeId)
+                }
+
+                is AnimDetailScreenInteract.navigateYoutubeScreen -> {
+                    navController.navigate("${routes.YOUTUBE_SCREEN}/${it.youtubeId}")
                 }
             }
         }
@@ -213,8 +218,14 @@ fun AnimDetailScreen(
                                                 Alignment.Center
                                             )
                                             .clickable(onClick = {
+//                                                viewModel.sendAction(
+//                                                    AnimDetailScreenInteract.viewYoutubeTrailer(
+//                                                        id,
+//                                                    )
+//                                                )
+
                                                 viewModel.sendAction(
-                                                    AnimDetailScreenInteract.viewYoutubeTrailer(
+                                                    AnimDetailScreenInteract.navigateYoutubeScreen(
                                                         id,
                                                     )
                                                 )

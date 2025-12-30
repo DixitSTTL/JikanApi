@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 class UseCaseMainScreen(private val animListScreenRepository: AnimListRepository) {
 
-    fun fetchFlowImage(): Flow<PagingData<AnimeEntity>> {
+    fun fetchFlowAnim(): Flow<PagingData<AnimeEntity>> {
         return animListScreenRepository.getFlowAnimList()
     }
 

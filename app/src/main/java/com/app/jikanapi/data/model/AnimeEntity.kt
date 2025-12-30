@@ -14,6 +14,7 @@ data class AnimeEntity(
     val titleJapanese: String?,
 
     val imageUrl: String?,
+    val youtubeId: String?,
 
     val type: String?,
     val source: String?,

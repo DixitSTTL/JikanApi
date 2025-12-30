@@ -12,18 +12,21 @@ import com.app.jikanapi.domain.room.DatabaseHelper
 import kotlinx.coroutines.flow.Flow
 
 class AnimListRepositoryImpl(
-    private val imageListPagingSource: AnimListPagingSource,
+    private val animListPagingSource: AnimListPagingSource,
     private val networkClient: NetworkClient,
     private val databaseHelper: DatabaseHelper
 ) : AnimListRepository {
     @OptIn(ExperimentalPagingApi::class)
     override fun getFlowAnimList(): Flow<PagingData<AnimeEntity>> = Pager(
-        config = PagingConfig(20), pagingSourceFactory = {
-
+        config = PagingConfig(
+            pageSize = 25,
+            initialLoadSize = 25,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = {
             databaseHelper.daoAnim().getAllAnim()
         },
         remoteMediator = AnimRemoteMediator(networkClient, databaseHelper)
-
     ).flow
 
 }

@@ -24,7 +24,7 @@ class AnimListPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, AnimeEntity> {
         return try {
             val page = params.key ?: 1
-            val response = networkClient.getFlowImageList(page = page)
+            val response = networkClient.getFlowAnimList(page = page)
             Log.d("TAG", "load: " + response)
 
             /*if (page==1){

@@ -1,8 +1,5 @@
 package com.app.jikanapi.common
 
-import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,12 +29,10 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.app.jikanapi.data.model.AnimeEntity
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SharedTransitionScope.AnimList(
-    imageList: LazyPagingItems<AnimeEntity>,
+fun AnimList(
+    animList: LazyPagingItems<AnimeEntity>,
     onClick: (AnimeEntity, String) -> Unit,
-    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
 
     LazyVerticalGrid(
@@ -46,9 +41,9 @@ fun SharedTransitionScope.AnimList(
         columns = GridCells.Fixed(2),
     ) {
         items(
-            imageList.itemCount,
+            animList.itemCount,
         ) { index ->
-            val item = imageList[index] ?: return@items // This ensures pagination works correctly
+            val item = animList[index] ?: return@items // This ensures pagination works correctly
 
             Column(Modifier.padding(6.dp)) {
 
@@ -56,14 +51,9 @@ fun SharedTransitionScope.AnimList(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(300.dp)
-                        .padding(4.dp)
-                        .sharedElement(
-                            rememberSharedContentState(key = "${item.malId}_${index}"),
-                            animatedVisibilityScope = animatedVisibilityScope,
-                            zIndexInOverlay = 2F,
-                        ),
+                        .padding(4.dp),
                     onClick = {
-                        imageList[index]?.let {
+                        animList[index]?.let {
                             onClick(item, index.toString())
 
                         }
@@ -119,22 +109,8 @@ fun SharedTransitionScope.AnimList(
 
             }
         }
-        imageList.apply {
+        animList.apply {
             when {
-                loadState.refresh is LoadState.Loading -> {
-                    item { CircularProgressIndicator(color = Color.Black) }
-                }
-
-//                loadState.refresh is LoadState.Error -> {
-//                    val error = moviePagingItems.loadState.refresh as LoadState.Error
-//                    item {
-//                        ErrorMessage(
-//                            modifier = Modifier.fillParentMaxSize(),
-//                            message = error.error.localizedMessage!!,
-//                            onClickRetry = { retry() })
-//                    }
-//                }
-//
                 loadState.append is LoadState.Loading -> {
                     item {
                         Box(

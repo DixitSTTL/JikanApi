@@ -23,25 +23,32 @@ class AnimRemoteMediator(
 
             val page = when (loadType) {
                 LoadType.REFRESH -> 1
-                LoadType.APPEND -> state.pages.size + 1
-                LoadType.PREPEND -> return MediatorResult.Success(true)
+                LoadType.APPEND -> {
+                    val lastItem = state.lastItemOrNull()
+                        ?: return MediatorResult.Success(endOfPaginationReached = true)
+
+                    state.pages.size + 1 // works ONLY when pageSize matches backend
+                }
+
+                LoadType.PREPEND ->
+                    return MediatorResult.Success(endOfPaginationReached = true)
             }
 
-            val response = api.getFlowImageList(page)
+            val response = api.getFlowAnimList(page)
 
-            response.data?.let { data ->
-                database.withTransaction {
-                    if (loadType == LoadType.REFRESH) {
-                        database.daoAnim().clearAll()
-                    }
-                    database.daoAnim().insertAll(
-                        data.map { it.toEntity() }
-                    )
+            val data = response.data ?: emptyList()
+
+            database.withTransaction {
+                if (loadType == LoadType.REFRESH) {
+                    database.daoAnim().clearAll()
                 }
+                database.daoAnim().insertAll(
+                    data.map { it.toEntity() }
+                )
             }
 
             MediatorResult.Success(
-                endOfPaginationReached = response.data == null
+                endOfPaginationReached = !response.pagination.has_next_page
             )
 
         } catch (e: Exception) {
@@ -49,3 +56,4 @@ class AnimRemoteMediator(
         }
     }
 }
+

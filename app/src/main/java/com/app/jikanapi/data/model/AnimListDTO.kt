@@ -1,5 +1,6 @@
 package com.app.jikanapi.data.model
 
+import com.app.jikanapi.data.utils.Utils.extractYouTubeId
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -103,6 +104,7 @@ data class AnimDataDTO(
             titleEnglish = titleEnglish,
             titleJapanese = titleJapanese,
             imageUrl = images?.jpg?.largeImageUrl,
+            youtubeId = trailer?.embedUrl?.extractYouTubeId(),
             type = type,
             source = source,
             episodes = episodes,

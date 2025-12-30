@@ -10,7 +10,7 @@ import io.ktor.http.appendPathSegments
 
 class NetworkClient(private val client: HttpClient) {
 
-    suspend fun getFlowImageList(page: Int): AnimListDTO {
+    suspend fun getFlowAnimList(page: Int): AnimListDTO {
 
         val response = client.get(NetworkConstants.topAnim) {
             url {

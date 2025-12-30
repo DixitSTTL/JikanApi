@@ -1,11 +1,9 @@
 package com.app.jikanapi.presentation.main
 
-import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -14,34 +12,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.app.jikanapi.common.AnimList
 import com.app.jikanapi.domain.routes
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SharedTransitionScope.MainScreen(
+fun MainScreen(
     navController: NavHostController,
-    animatedVisibilityScope: AnimatedVisibilityScope,
     viewModel: MainScreenViewModel = koinViewModel()
 ) {
 
     val state by viewModel.state.collectAsState()
-    val stateImageFlow = state.data.imageFlowList.collectAsLazyPagingItems()
+    val stateAnimListFlow = viewModel.animFlowList.collectAsLazyPagingItems()
 
 
     LaunchedEffect(Unit) {
         viewModel.uiAction.collectLatest {
             when (it) {
-                is MainScreenInteract.navigateImagePreview -> {
-//                    val data = Uri.encode(Gson().toJson(it.data))
+                is MainScreenInteract.navigateAnimDetail -> {
                     navController.navigate("${routes.ANIM_DETAIL_SCREEN}/${it.data.malId}")
                 }
-
             }
         }
 
@@ -64,17 +61,23 @@ fun SharedTransitionScope.MainScreen(
 //                .background(color = Theme.colors.background)
         )
         {
-            AnimList(
-                stateImageFlow,
-                onClick = { it, index ->
-                    viewModel.sendAction(
-                        MainScreenInteract.navigateImagePreview(
-                            it,
-                            index
+            if (stateAnimListFlow.loadState.refresh is LoadState.Loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else {
+
+                AnimList(
+                    stateAnimListFlow,
+                    onClick = { it, index ->
+                        viewModel.sendAction(
+                            MainScreenInteract.navigateAnimDetail(
+                                it,
+                            )
                         )
-                    )
-                }, animatedVisibilityScope
-            )
+                    }
+                )
+            }
         }
     }
 

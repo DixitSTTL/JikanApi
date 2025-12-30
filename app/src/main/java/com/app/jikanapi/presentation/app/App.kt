@@ -13,6 +13,7 @@ import com.app.jikanapi.domain.routes
 import com.app.jikanapi.presentation.animdetail.AnimDetailScreen
 import com.app.jikanapi.presentation.main.MainScreen
 import com.app.jikanapi.presentation.ui.theme.JikanApiTheme
+import com.app.jikanapi.presentation.youtube.YoutubeScreen
 
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -28,7 +29,6 @@ fun App() {
                 composable<routes.MAIN_SCREEN> { backStackEntry ->
                     MainScreen(
                         navController,
-                        animatedVisibilityScope = this@composable
                     )
                 }
 
@@ -43,14 +43,31 @@ fun App() {
 
                     backStackEntry.arguments?.let {
                         val id = backStackEntry.arguments?.getString("animId")
-//                        val index = backStackEntry.arguments?.getString("Index") ?: ""
-//                        val data =
-//                            Gson().fromJson(dataJson, AnimDataDTO::class.java) // Decode recipe JSON
-
                         id?.let {
                             AnimDetailScreen(
                                 navController,
-                                animatedVisibilityScope = this@composable,
+                                id
+                            )
+                        }
+
+                    }
+
+                }
+
+                composable(
+                    routes.YOUTUBE_SCREEN.route,
+                    arguments = listOf(
+                        navArgument("youtubeId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    BackHandler {
+                        navController.popBackStack()
+                    }
+
+                    backStackEntry.arguments?.let {
+                        val id = backStackEntry.arguments?.getString("youtubeId")
+                        id?.let {
+                            YoutubeScreen(
+                                navController,
                                 id
                             )
                         }

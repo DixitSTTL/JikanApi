@@ -1,5 +1,12 @@
 package com.app.jikanapi.presentation.animdetail
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -17,6 +24,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,8 +54,10 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.app.jikanapi.R
+import com.app.jikanapi.data.utils.Utils.isInternetConnected
 import com.app.jikanapi.data.utils.Utils.openYoutube
 import com.app.jikanapi.domain.routes
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -63,6 +73,12 @@ fun AnimDetailScreen(
 
     val state = viewModel.state.collectAsStateWithLifecycle().value.data
     var imageLoaded by remember { mutableStateOf(false) }
+    var visible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = state.animData) {
+       delay(300)
+       visible = true
+    }
 
 
     LaunchedEffect(Unit) {
@@ -109,26 +125,34 @@ fun AnimDetailScreen(
 
 
                     if (state.animData?.imageUrl?.isNotEmpty() == true) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
+
+                        AnimatedVisibility(
+                            visible = visible,
+                            enter = expandVertically() + scaleIn() + fadeIn(),
+                            exit = shrinkVertically() + scaleOut() + fadeOut()
                         ) {
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(state.animData?.imageUrl)
-                                    .crossfade(true)
-                                    .build(),
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxWidth(),
-                                contentScale = ContentScale.FillWidth,
-                                onSuccess = {
-                                    imageLoaded = true
-                                },
-                                onError = {
-                                    imageLoaded = false
-                                }
-                            )
+
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(4.dp)
+                            ) {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(state.animData?.imageUrl)
+                                        .crossfade(true)
+                                        .build(),
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentScale = ContentScale.FillWidth,
+                                    onSuccess = {
+                                        imageLoaded = true
+                                    },
+                                    onError = {
+                                        imageLoaded = false
+                                    }
+                                )
+                            }
                         }
 
                         if (imageLoaded) {
@@ -218,17 +242,20 @@ fun AnimDetailScreen(
                                                 Alignment.Center
                                             )
                                             .clickable(onClick = {
-//                                                viewModel.sendAction(
-//                                                    AnimDetailScreenInteract.viewYoutubeTrailer(
-//                                                        id,
-//                                                    )
-//                                                )
-
-                                                viewModel.sendAction(
-                                                    AnimDetailScreenInteract.navigateYoutubeScreen(
-                                                        id,
+                                                if(context.isInternetConnected()){
+                                                    viewModel.sendAction(
+                                                        AnimDetailScreenInteract.navigateYoutubeScreen(
+                                                            id,
+                                                        )
                                                     )
-                                                )
+                                                }else{
+                                                    viewModel.sendAction(
+                                                        AnimDetailScreenInteract.viewYoutubeTrailer(
+                                                            id,
+                                                        )
+                                                    )
+                                                }
+
                                             })
 
                                     )

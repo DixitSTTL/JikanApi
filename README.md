@@ -18,6 +18,7 @@ A simple Android app built with **Jetpack Compose** that uses the **Jikan API (M
 <p align="center">
   <img src="screenshots/jikan_1.png" width="250"/>
   <img src="screenshots/jikan_2.png" width="250"/>
+  <img src="screenshots/jikan_4.png" width="250"/>
   <img src="screenshots/jikan_3.png" width="250"/>
 </p>
 
